@@ -1,6 +1,6 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Rocket, Mail, Phone, MapPin } from 'lucide-react';
+import React from "react";
+import { Link } from "react-router-dom";
+import { Rocket, Mail, Phone, MapPin } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -14,7 +14,8 @@ const Footer = () => {
               <span className="text-2xl font-bold">YCX.ai</span>
             </div>
             <p className="text-gray-400">
-              Connecting SMBs with innovative YC startups to drive growth and success.
+              Matching SMB's with YC Startups accelerating Your Customers
+              Experience.
             </p>
           </div>
 
@@ -28,7 +29,10 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/submit-lead" className="text-gray-400 hover:text-white">
+                <Link
+                  to="/submit-lead"
+                  className="text-gray-400 hover:text-white"
+                >
                   Find Solutions
                 </Link>
               </li>
@@ -46,15 +50,12 @@ const Footer = () => {
             <ul className="space-y-2">
               <li className="flex items-center space-x-2 text-gray-400">
                 <Mail className="h-5 w-5" />
-                <span>contact@ycx.ai</span>
+                <span>hello@ycx.ai</span>
               </li>
-              <li className="flex items-center space-x-2 text-gray-400">
-                <Phone className="h-5 w-5" />
-                <span>+1 (555) 123-4567</span>
-              </li>
+
               <li className="flex items-center space-x-2 text-gray-400">
                 <MapPin className="h-5 w-5" />
-                <span>San Francisco, CA</span>
+                <span>London, UK</span>
               </li>
             </ul>
           </div>

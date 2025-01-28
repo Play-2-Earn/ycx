@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Rocket, Menu, X } from "lucide-react";
 import { useState } from "react";
+import ycxlogo from "../assets/ycxlogo_final.png";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,8 +13,8 @@ const Navbar = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <Rocket className="h-8 w-8 text-indigo-600" />
-              <span className="text-2xl font-bold text-gray-900">YCX.ai</span>
+              <img src={ycxlogo} alt="YCX Logo" className="h-8 w-8" />
+              <span className="text-2xl font-bold text-gray-900">YCX.Ai</span>
             </Link>
           </div>
 

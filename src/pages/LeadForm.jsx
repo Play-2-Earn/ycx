@@ -1,53 +1,25 @@
 import React, { useState } from "react";
 import {
   Building2,
+  Phone,
+  Mail,
+  Globe,
+  Rocket,
+  Zap,
   Users,
-  MapPin,
   BarChart,
-  Server,
-  Target,
-  Plus,
-  X,
-  Loader2,
 } from "lucide-react";
 
-const LeadForm = () => {
-  const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
+const YCXLeadForm = () => {
   const [formData, setFormData] = useState({
-    companyName: "",
-    industry: "",
-    revenue: "",
-    employees: "",
-    location: "",
-    painPoints: [""],
-    cltv: "",
-    art: "",
-    satisfaction: "",
-    crm: "",
-    supportSoftware: "",
-    aiTools: "",
-    goals: [""],
-    additionalNotes: "",
+    name: "",
+    phone: "",
+    email: "",
+    website: "",
   });
 
-  const industries = [
-    "E-commerce",
-    "Logistics",
-    "Retail",
-    "Healthcare",
-    "Technology",
-    "Manufacturing",
-    "Finance",
-    "Education",
-    "Other",
-  ];
-
-  const revenueRanges = ["<$1M", "$1M–$5M", "$5M–$10M", ">$10M"];
-
-  const employeeRanges = ["<10", "10–50", "50–100", ">100"];
+  const [status, setStatus] = useState({ type: "", message: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -57,56 +29,10 @@ const LeadForm = () => {
     }));
   };
 
-  // Handle dynamic pain points
-  const addPainPoint = () => {
-    setFormData((prev) => ({
-      ...prev,
-      painPoints: [...prev.painPoints, ""],
-    }));
-  };
-
-  const removePainPoint = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      painPoints: prev.painPoints.filter((_, i) => i !== index),
-    }));
-  };
-
-  const updatePainPoint = (index, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      painPoints: prev.painPoints.map((item, i) =>
-        i === index ? value : item
-      ),
-    }));
-  };
-
-  // Handle dynamic goals
-  const addGoal = () => {
-    setFormData((prev) => ({
-      ...prev,
-      goals: [...prev.goals, ""],
-    }));
-  };
-
-  const removeGoal = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      goals: prev.goals.filter((_, i) => i !== index),
-    }));
-  };
-
-  const updateGoal = (index, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      goals: prev.goals.map((item, i) => (i === index ? value : item)),
-    }));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
+    setIsSubmitting(true);
+    setStatus({ type: "", message: "" });
 
     try {
       const response = await fetch("/api/leads", {
@@ -114,456 +40,216 @@ const LeadForm = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...formData,
-          painPoints: formData.painPoints.filter(
-            (point) => point.trim() !== ""
-          ),
-          goals: formData.goals.filter((goal) => goal.trim() !== ""),
-          submittedAt: new Date().toISOString(),
-        }),
+        body: JSON.stringify(formData),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to submit form");
-      }
+      if (!response.ok) throw new Error("Submission failed");
 
-      setSuccess(true);
-      // Reset form after successful submission
-      setTimeout(() => {
-        setFormData({
-          companyName: "",
-          industry: "",
-          revenue: "",
-          employees: "",
-          location: "",
-          painPoints: [""],
-          cltv: "",
-          art: "",
-          satisfaction: "",
-          crm: "",
-          supportSoftware: "",
-          aiTools: "",
-          goals: [""],
-          additionalNotes: "",
-        });
-        setStep(1);
-        setSuccess(false);
-      }, 3000);
-    } catch (err) {
-      setError("Failed to submit form. Please try again.");
+      setStatus({
+        type: "success",
+        message:
+          "🚀 Success! Your YCX matching process has started. We'll contact you within 24 hours.",
+      });
+      setFormData({ name: "", phone: "", email: "", website: "" });
+    } catch (error) {
+      setStatus({
+        type: "error",
+        message:
+          "⚠️ Connection failed. Please try again or contact support@ycx.ai",
+      });
     } finally {
-      setLoading(false);
-    }
-  };
-
-  const renderDynamicInputs = (
-    field,
-    items,
-    addItem,
-    removeItem,
-    updateItem,
-    placeholder
-  ) => (
-    <div className="space-y-3">
-      {items.map((item, index) => (
-        <div key={index} className="flex gap-2">
-          <input
-            type="text"
-            value={item}
-            onChange={(e) => updateItem(index, e.target.value)}
-            className="flex-1 rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
-            placeholder={placeholder}
-          />
-          <button
-            type="button"
-            onClick={() => removeItem(index)}
-            className="p-2 text-gray-500 hover:text-red-500 focus:outline-none"
-            disabled={items.length === 1}
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-      ))}
-      <button
-        type="button"
-        onClick={addItem}
-        className="flex items-center gap-2 text-blue-600 hover:text-blue-700 focus:outline-none"
-      >
-        <Plus className="w-4 h-4" />
-        Add {field}
-      </button>
-    </div>
-  );
-
-  const renderStepContent = () => {
-    switch (step) {
-      case 1:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-blue-800 flex items-center gap-2">
-              <Building2 className="w-6 h-6" />
-              Basic Business Information
-            </h2>
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Company Name
-                  </label>
-                  <input
-                    type="text"
-                    name="companyName"
-                    value={formData.companyName}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Industry
-                  </label>
-                  <select
-                    name="industry"
-                    value={formData.industry}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  >
-                    <option value="">Select Industry</option>
-                    {industries.map((industry) => (
-                      <option key={industry} value={industry}>
-                        {industry}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Annual Revenue
-                  </label>
-                  <select
-                    name="revenue"
-                    value={formData.revenue}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  >
-                    <option value="">Select Revenue Range</option>
-                    {revenueRanges.map((range) => (
-                      <option key={range} value={range}>
-                        {range}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Number of Employees
-                  </label>
-                  <select
-                    name="employees"
-                    value={formData.employees}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  >
-                    <option value="">Select Employee Range</option>
-                    {employeeRanges.map((range) => (
-                      <option key={range} value={range}>
-                        {range}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Location
-                </label>
-                <input
-                  type="text"
-                  name="location"
-                  value={formData.location}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="City, State/Region"
-                  required
-                />
-              </div>
-            </div>
-          </div>
-        );
-
-      case 2:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-blue-800 flex items-center gap-2">
-              <BarChart className="w-6 h-6" />
-              Customer Experience Information
-            </h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Key Pain Points
-                </label>
-                {renderDynamicInputs(
-                  "Pain Point",
-                  formData.painPoints,
-                  addPainPoint,
-                  removePainPoint,
-                  updatePainPoint,
-                  "Describe a key challenge your business faces..."
-                )}
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Average Customer Lifetime Value
-                  </label>
-                  <input
-                    type="text"
-                    name="cltv"
-                    value={formData.cltv}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="e.g., $1,000"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Average Resolution Time
-                  </label>
-                  <input
-                    type="text"
-                    name="art"
-                    value={formData.art}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="e.g., 24 hours"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Customer Satisfaction
-                  </label>
-                  <input
-                    type="text"
-                    name="satisfaction"
-                    value={formData.satisfaction}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="e.g., 4.5/5"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 3:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-blue-800 flex items-center gap-2">
-              <Server className="w-6 h-6" />
-              Tech Stack & Goals
-            </h2>
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    CRM System
-                  </label>
-                  <input
-                    type="text"
-                    name="crm"
-                    value={formData.crm}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="e.g., HubSpot, Salesforce"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Support Software
-                  </label>
-                  <input
-                    type="text"
-                    name="supportSoftware"
-                    value={formData.supportSoftware}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="e.g., Zendesk, Freshdesk"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Current AI Tools
-                  </label>
-                  <input
-                    type="text"
-                    name="aiTools"
-                    value={formData.aiTools}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="e.g., Chatbots, Analytics"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Business Goals
-                </label>
-                {renderDynamicInputs(
-                  "Goal",
-                  formData.goals,
-                  addGoal,
-                  removeGoal,
-                  updateGoal,
-                  "Describe a goal you want to achieve..."
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Additional Notes
-                </label>
-                <textarea
-                  name="additionalNotes"
-                  value={formData.additionalNotes}
-                  onChange={handleInputChange}
-                  rows={4}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="Please share any additional information about your challenges and vision..."
-                />
-              </div>
-            </div>
-          </div>
-        );
-
-      default:
-        return null;
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white p-6">
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-lg shadow-xl p-8">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-blue-900">
-              YCX.ai Business Profile
-            </h1>
-            <p className="text-gray-600 mt-2">
-              Help us understand your business better
-            </p>
-          </div>
+    <div className="min-h-screen bg-white flex flex-col lg:flex-row items-center justify-center p-4 sm:p-8 space-y-8 lg:space-y-0">
+      {/* Left Side - Value Proposition */}
+      <div className="lg:w-1/2 max-w-xl text-center lg:text-left p-4 sm:p-8">
+        <div className="flex items-center gap-3 mb-8 justify-center lg:justify-start"></div>
 
-          {/* Progress Steps */}
-          <div className="flex justify-between mb-8">
-            {[1, 2, 3].map((stepNumber) => (
-              <div key={stepNumber} className="flex-1 relative">
-                <button
-                  onClick={() => setStep(stepNumber)}
-                  disabled={loading}
-                  className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto
-                    ${
-                      step === stepNumber
-                        ? "bg-blue-600 text-white"
-                        : step > stepNumber
-                        ? "bg-blue-200 text-blue-800"
-                        : "bg-gray-100 text-gray-500"
-                    } transition-all duration-200`}
-                >
-                  {stepNumber}
-                </button>
-                <div className="text-xs text-center mt-2 text-gray-600">
-                  {stepNumber === 1
-                    ? "Business Info"
-                    : stepNumber === 2
-                    ? "Customer Experience"
-                    : "Tech & Goals"}
-                </div>
-                {stepNumber < 3 && (
-                  <div
-                    className={`absolute top-5 left-1/2 w-full h-0.5 
-                    ${step > stepNumber ? "bg-blue-200" : "bg-gray-100"}`}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+          <span className="text-blue-600">Yield Customer Experience</span> with
+          AI-Matched YC Solutions
+        </h1>
 
-          {/* Success Message */}
-          {success && (
-            <Alert className="mb-6 bg-green-50 border-green-200">
-              <AlertDescription className="text-green-800">
-                Thank you! Your information has been successfully submitted.
-              </AlertDescription>
-            </Alert>
-          )}
-
-          {/* Error Message */}
-          {error && (
-            <Alert className="mb-6 bg-red-50 border-red-200">
-              <AlertDescription className="text-red-800">
-                {error}
-              </AlertDescription>
-            </Alert>
-          )}
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {renderStepContent()}
-
-            <div className="mt-8 flex justify-between pt-5 border-t border-gray-200">
-              {step > 1 && (
-                <button
-                  type="button"
-                  onClick={() => setStep(step - 1)}
-                  disabled={loading}
-                  className="px-6 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 transition-colors duration-200"
-                >
-                  Previous
-                </button>
-              )}
-              {step < 3 ? (
-                <button
-                  type="button"
-                  onClick={() => setStep(step + 1)}
-                  disabled={loading}
-                  className={`${
-                    step === 1 ? "mx-auto" : "ml-auto"
-                  } px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-colors duration-200 flex items-center gap-2`}
-                >
-                  Next
-                </button>
-              ) : (
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="ml-auto px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-colors duration-200 flex items-center gap-2"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Submitting...
-                    </>
-                  ) : (
-                    "Submit"
-                  )}
-                </button>
-              )}
+        <div className="space-y-6 mb-12">
+          <div className="flex items-start gap-4">
+            <Zap className="h-6 w-6 text-blue-600 flex-shrink-0" />
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Streamlined AI Matching
+              </h3>
+              <p className="text-gray-600">
+                Connect with pre-vetted YC startups in 72 hours through our
+                AI-enhanced consultative process
+              </p>
             </div>
-          </form>
+          </div>
+
+          <div className="flex items-start gap-4">
+            <Users className="h-6 w-6 text-blue-600 flex-shrink-0" />
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Exclusive SMB Network
+              </h3>
+              <p className="text-gray-600">
+                Join 2,300+ qualified businesses accelerating growth with YC
+                partnerships
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-blue-50 p-6 rounded-xl space-y-4">
+          <div className="flex items-center gap-4">
+            <BarChart className="h-8 w-8 text-blue-600" />
+            <div>
+              <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">
+                Last Month's Success Metrics
+              </p>
+              <div className="flex gap-6 mt-2">
+                <div>
+                  <p className="text-2xl font-bold text-gray-900">94%</p>
+                  <p className="text-sm text-gray-600">Match Rate</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-gray-900">37h</p>
+                  <p className="text-sm text-gray-600">Avg. Connect Time</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side - Conversion Form */}
+      <div className="lg:w-1/2 max-w-xl w-full">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+          <div className="p-6 sm:p-10">
+            <div className="mb-8 text-center">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                Start Your YCX Matching
+              </h2>
+              <p className="text-gray-500">
+                Complete your profile to begin AI matching
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {Object.entries(formData).map(([key, value]) => {
+                const icons = {
+                  name: <Building2 className="h-5 w-5 text-gray-400" />,
+                  phone: <Phone className="h-5 w-5 text-gray-400" />,
+                  email: <Mail className="h-5 w-5 text-gray-400" />,
+                  website: <Globe className="h-5 w-5 text-gray-400" />,
+                };
+
+                return (
+                  <div key={key} className="relative group">
+                    <div className="absolute left-3 top-3.5">{icons[key]}</div>
+                    <input
+                      type={
+                        key === "email"
+                          ? "email"
+                          : key === "phone"
+                          ? "tel"
+                          : key === "website"
+                          ? "url"
+                          : "text"
+                      }
+                      name={key}
+                      value={value}
+                      onChange={handleInputChange}
+                      placeholder={
+                        key === "name"
+                          ? "Business Legal Name"
+                          : key === "phone"
+                          ? "Direct Contact Number"
+                          : key === "email"
+                          ? "Business Email Address"
+                          : "Company Website URL"
+                      }
+                      required
+                      className="w-full pl-12 pr-6 py-3.5 bg-gray-50/50 rounded-lg border border-gray-200 text-gray-900 placeholder-gray-400
+                        focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all
+                        group-hover:border-gray-300"
+                    />
+                  </div>
+                );
+              })}
+
+              {status.message && (
+                <div
+                  className={`p-4 rounded-lg ${
+                    status.type === "success"
+                      ? "bg-green-50 text-green-700 border border-green-100"
+                      : "bg-red-50 text-red-700 border border-red-100"
+                  }`}
+                >
+                  {status.message}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`w-full py-3.5 px-6 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold 
+                  hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 
+                  transform transition-all duration-300 flex items-center justify-center gap-2
+                  ${
+                    isSubmitting
+                      ? "opacity-85"
+                      : "hover:scale-[1.02] active:scale-95"
+                  }`}
+              >
+                {isSubmitting ? (
+                  <span className="animate-pulse">Matching...</span>
+                ) : (
+                  <>
+                    <span>Start AI Matching</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </>
+                )}
+              </button>
+            </form>
+
+            <div className="mt-8">
+              <p className="text-center text-gray-500 text-sm">
+                Protected by YCX's{" "}
+                <a href="#" className="text-blue-600 hover:underline">
+                  Enterprise-Grade Security
+                </a>
+              </p>
+              <div className="flex justify-center gap-4 mt-4">
+                {[
+                  /* Add partner logos here */
+                ].map((logo, index) => (
+                  <img
+                    key={index}
+                    src={logo}
+                    className="h-8 opacity-60 hover:opacity-100 transition-opacity"
+                    alt="Partner logo"
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 };
-export default LeadForm;
+
+export default YCXLeadForm;
