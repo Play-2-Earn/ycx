@@ -1,6 +1,6 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Rocket, Target, Users } from 'lucide-react';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { Rocket, Target, Users } from "lucide-react";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -12,13 +12,15 @@ const LandingPage = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-3xl">
             <h1 className="text-5xl font-bold mb-6">
-              Connect with cutting-edge YC startups to solve your business challenges
+              Connect with cutting-edge YC startups to solve your business
+              challenges
             </h1>
             <p className="text-xl mb-8">
-              We match your business with the perfect YC startup solutions to drive growth and innovation
+              We match your business with the perfect YC startup solutions to
+              drive growth and innovation
             </p>
             <button
-              onClick={() => navigate('/submit-lead')}
+              onClick={() => navigate("/submit-lead")}
               className="bg-white text-indigo-600 px-8 py-3 rounded-lg font-semibold hover:bg-indigo-50 transition-colors"
             >
               Find My Solution
