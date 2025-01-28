@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Building2,
   Phone,
@@ -9,6 +9,7 @@ import {
   Users,
   BarChart,
 } from "lucide-react";
+import { LeadContext } from "../Context/LeadContext";
 
 const YCXLeadForm = () => {
   const [formData, setFormData] = useState({
@@ -18,6 +19,7 @@ const YCXLeadForm = () => {
     website: "",
   });
 
+  const {addLead , success } = useContext(LeadContext)
   const [status, setStatus] = useState({ type: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -35,28 +37,30 @@ const YCXLeadForm = () => {
     setStatus({ type: "", message: "" });
 
     try {
-      const response = await fetch("/api/leads", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      // const response = await fetch("/api/leads", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify(formData),
+      // });
 
-      if (!response.ok) throw new Error("Submission failed");
+      // if (!response.ok) throw new Error("Submission failed");
 
-      setStatus({
-        type: "success",
-        message:
-          "🚀 Success! Your YCX matching process has started. We'll contact you within 24 hours.",
-      });
+      // setStatus({
+      //   type: "success",
+      //   message:
+      //     "🚀 Success! Your YCX matching process has started. We'll contact you within 24 hours.",
+      // });
+     const response = await addLead(formData)
       setFormData({ name: "", phone: "", email: "", website: "" });
+      console.log(response.message)
     } catch (error) {
-      setStatus({
-        type: "error",
-        message:
-          "⚠️ Connection failed. Please try again or contact support@ycx.ai",
-      });
+      // setStatus({
+      //   type: "error",
+      //   message:
+      //     "⚠️ Connection failed. Please try again or contact support@ycx.ai",
+      // });
     } finally {
       setIsSubmitting(false);
     }
@@ -170,8 +174,7 @@ const YCXLeadForm = () => {
                           ? "Business Email Address"
                           : "Company Website URL"
                       }
-                      required
-                      className="w-full pl-12 pr-6 py-3.5 bg-gray-50/50 rounded-lg border border-gray-200 text-gray-900 placeholder-gray-400
+                                            className="w-full pl-12 pr-6 py-3.5 bg-gray-50/50 rounded-lg border border-gray-200 text-gray-900 placeholder-gray-400
                         focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all
                         group-hover:border-gray-300"
                     />
@@ -194,8 +197,8 @@ const YCXLeadForm = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full py-3.5 px-6 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold 
-                  hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 
+                className={`w-full py-3.5 px-6 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold
+                  hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30
                   transform transition-all duration-300 flex items-center justify-center gap-2
                   ${
                     isSubmitting
